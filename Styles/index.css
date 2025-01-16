@@ -1,7 +1,5 @@
-.concursante1, .concursante2, .concursante3 {
-    display: none;
-}
 
+/* ========================================= */
 /* Ocultar elementos */
 .hidden {
     display: none;
@@ -12,4 +10,9 @@
     display: block;
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
+}
+
+/* ========================================= */
+.concursante1, .concursante2, .concursante3 {
+    display: none;
 }
