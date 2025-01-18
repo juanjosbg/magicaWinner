@@ -16,3 +16,8 @@
 .concursante1, .concursante2, .concursante3 {
     display: none;
 }
+
+
+html {
+    scroll-behavior: smooth;
+}
