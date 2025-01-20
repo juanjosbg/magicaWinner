@@ -21,6 +21,9 @@ function showConcursante(index) {
 
     // Iniciar carrusel para el concursante actual
     iniciarCarrusel(concursantes[index].querySelector('.carousel-slide'));
+
+    // Desplazamiento automático al concursante
+    scrollToConcursante(concursantes[index].id);
 }
 
 function updatePaginationText() {
@@ -60,6 +63,14 @@ function iniciarCarrusel(slider) {
     slider.dataset.interval = setInterval(moveSlider, 2000);
 }
 
+// Función para desplazar automáticamente al concursante cuando se carga el fragmento en la URL
+function scrollToConcursante(concursanteId) {
+    const element = document.getElementById(concursanteId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     handlePagination();
 
@@ -95,6 +106,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = Array.from(concursantes).indexOf(targetConcursante);
             currentPage = index >= 0 ? index : 0;
             handlePagination();
+        }
+    }
+
+    // Desplazarse automáticamente a la sección correspondiente si hay un fragmento
+    const fragment = window.location.hash;
+    if (fragment) {
+        const element = document.querySelector(fragment);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
         }
     }
 });
