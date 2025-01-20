@@ -1,34 +1,31 @@
 let currentPage = 0;
-const concursantes = document.querySelectorAll('[id^="concursante"]');
+const concursantes = document.querySelectorAll('.concursante');
 const totalPages = concursantes.length;
 const prevButton = document.getElementById('prev');
 const nextButton = document.getElementById('next');
 const paginationLinks = document.querySelectorAll('[id^="page"]');
 
-// Elementos para mostrar el rango de resultados
 const startSpan = document.getElementById('start');
 const endSpan = document.getElementById('end');
 const totalSpan = document.getElementById('total');
 
 function showConcursante(index) {
     concursantes.forEach((concursante, i) => {
-        concursante.style.display = i === index ? 'block' : 'none';
+        concursante.classList.toggle('hidden', i !== index);
     });
 
     // Actualizar el hash en la URL
     if (concursantes[index]) {
         window.location.hash = concursantes[index].id;
     }
+
+    // Iniciar carrusel para el concursante actual
+    iniciarCarrusel(concursantes[index].querySelector('.carousel-slide'));
 }
 
 function updatePaginationText() {
-    const itemsPerPage = 1;
-    const start = currentPage * itemsPerPage + 1;
-    const end = Math.min((currentPage + 1) * itemsPerPage, totalPages);
-    
-    // Actualizar el texto de "Showing"
-    startSpan.textContent = start;
-    endSpan.textContent = end;
+    startSpan.textContent = currentPage + 1;
+    endSpan.textContent = totalPages;
     totalSpan.textContent = totalPages;
 }
 
@@ -47,9 +44,20 @@ function handlePagination() {
 function updateButtons() {
     prevButton.disabled = currentPage === 0;
     nextButton.disabled = currentPage === totalPages - 1;
+}
 
-    prevButton.classList.toggle('opacity-50', currentPage === 0);
-    nextButton.classList.toggle('opacity-50', currentPage === totalPages - 1);
+function iniciarCarrusel(slider) {
+    let index = 0;
+    const images = slider.children;
+    const totalImages = images.length;
+
+    function moveSlider() {
+        index = (index + 1) % totalImages;
+        slider.style.transform = `translateX(-${index * 100}%)`;
+    }
+
+    clearInterval(slider.dataset.interval); // Detener carrusel anterior
+    slider.dataset.interval = setInterval(moveSlider, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -58,46 +66,34 @@ document.addEventListener('DOMContentLoaded', () => {
     paginationLinks.forEach((link, index) => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
-            document.getElementById('loading').classList.remove('hidden');
-            setTimeout(() => {
-                currentPage = index;
-                handlePagination();
-                document.getElementById('loading').classList.add('hidden');
-            }, 500);
+            currentPage = index;
+            handlePagination();
         });
     });
 
     prevButton.addEventListener('click', (event) => {
         event.preventDefault();
         if (currentPage > 0) {
-            document.getElementById('loading').classList.remove('hidden');
-            setTimeout(() => {
-                currentPage--;
-                handlePagination();
-                document.getElementById('loading').classList.add('hidden');
-            }, 500);
+            currentPage--;
+            handlePagination();
         }
     });
 
     nextButton.addEventListener('click', (event) => {
         event.preventDefault();
         if (currentPage < totalPages - 1) {
-            document.getElementById('loading').classList.remove('hidden');
-            setTimeout(() => {
-                currentPage++;
-                handlePagination();
-                document.getElementById('loading').classList.add('hidden');
-            }, 500);
+            currentPage++;
+            handlePagination();
         }
     });
 
-    // Manejo del hash de la URL al cargar la página
+    // Detectar hash en la URL al cargar
     const currentHash = window.location.hash.substring(1);
     if (currentHash) {
         const targetConcursante = document.getElementById(currentHash);
         if (targetConcursante) {
             const index = Array.from(concursantes).indexOf(targetConcursante);
-            currentPage = index >= 0 ? index : 0; // Si el índice es válido, lo actualizamos
+            currentPage = index >= 0 ? index : 0;
             handlePagination();
         }
     }
